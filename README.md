@@ -1,6 +1,6 @@
-# Fuera de Guion
+# fueradeguion
 
-Nombre provisional para una productora en español sobre decisiones, errores y casualidades que cambiaron historias reales. Narración directa, curiosidad sin exageración, voz con pausas y énfasis en los giros. Azul noche, marfil y ámbar, con cifras monoespaciadas. El nombre y los identificadores siguen pendientes de disponibilidad.
+Productora en español sobre decisiones, errores y casualidades que cambiaron historias reales. Narración directa, curiosidad sin exageración, voz con pausas y énfasis en los giros. Azul noche, marfil y ámbar, con cifras monoespaciadas. La disponibilidad de los identificadores en redes sigue pendiente.
 
 ## Producción por episodio
 
@@ -24,13 +24,7 @@ Punto de partida operativo: revisar y publicar el largo desde YouTube Studio, ca
 - Equipo de software: [NASA, Margaret Hamilton](https://www.nasa.gov/wp-content/uploads/static/history/alsj/a11/a11Hamilton.html).
 - Cadena de decisión y maniobra final: [NASA, Jack Garman](https://www.nasa.gov/image-article/apollo-era-hero-john-jack-garman-dies/) y [transcripción del descenso](https://nasa.gov/wp-content/uploads/static/history/alsj/a11/a11.landing.html).
 
-Los gráficos son originales y esquemáticos. No se incorporan fotos, logos ni audio de archivo. La voz Paulina de macOS es para revisión interna, con derechos comerciales pendientes de verificar. Los subtítulos se temporizan por segmentos de escena y requieren alineación fina antes de publicar.
-
-El guion está en `guion.json`. Con dependencias instaladas, abrir `npx remotion studio index.jsx`. Renderizar con `npx remotion render index.jsx Apolo11 piloto.mp4` y `npx remotion render index.jsx Apolo11Vertical clip.mp4`.
-
-## Versión extendida
-
-La marca definitiva se escribe **fueradeguion**. El guion completo está en `piloto.txt`. `preparar.py` genera el audio con Piper y la voz mexicana Claude y calcula la duración de cada segmento. Las tres composiciones verticales reutilizan segmentos narrados del montaje horizontal y añaden una pregunta final. Los MP4 se exportan con estos comandos:
+Los gráficos son originales y esquemáticos. El guion está en `piloto.txt`. `preparar.py` genera la narración con Piper y calcula los tiempos de cada segmento de subtítulos a partir de su audio. Las tres composiciones verticales reutilizan segmentos narrados del montaje horizontal y añaden una pregunta final. Los MP4 se exportan con estos comandos:
 
 ```sh
 npm ci
