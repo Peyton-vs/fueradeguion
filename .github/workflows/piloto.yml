@@ -1,0 +1,55 @@
+name: Render del piloto
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar narración
+        run: |
+          pip install piper-tts==1.8.0
+          mkdir -p .voz public
+          root=https://huggingface.co/rhasspy/piper-voices/resolve/main/es/es_MX/claude/high
+          curl -fLsS --retry 3 "$root/es_MX-claude-high.onnx" -o .voz/es_MX-claude-high.onnx
+          curl -fLsS --retry 3 "$root/es_MX-claude-high.onnx.json" -o .voz/es_MX-claude-high.onnx.json
+          python preparar.py
+      - run: npm ci
+      - name: Exportar los cuatro videos
+        run: |
+          mkdir -p exportaciones
+          npx remotion render index.jsx Apolo11 exportaciones/apolo-11.mp4 --browser-executable=/usr/bin/google-chrome --concurrency=4
+          for clip in 1 2 3; do
+            npx remotion render index.jsx Apolo11Clip$clip exportaciones/clip-0$clip.mp4 --browser-executable=/usr/bin/google-chrome --concurrency=2
+          done
+      - name: Verificar formato y duración
+        run: |
+          python - <<'PY'
+          import json, pathlib, subprocess
+          files = sorted(pathlib.Path('exportaciones').glob('*.mp4'))
+          assert len(files) == 4
+          for i, path in enumerate(files):
+              data = json.loads(subprocess.check_output(['ffprobe', '-v', 'error', '-show_streams', '-show_format', '-of', 'json', str(path)]))
+              video = next(stream for stream in data['streams'] if stream['codec_type'] == 'video')
+              assert any(stream['codec_type'] == 'audio' for stream in data['streams'])
+              duration = float(data['format']['duration'])
+              assert (video['width'], video['height']) == ((1920, 1080) if i == 0 else (1080, 1920))
+              assert (480 <= duration <= 900) if i == 0 else (10 <= duration <= 60)
+              print(path, duration, 's')
+          PY
+      - name: Crear entrega en GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create piloto-apolo-11 exportaciones/*.mp4 --title 'La alarma 1202 del Apolo 11' --notes 'Piloto de fueradeguion y tres cortes verticales. Gráficos originales. Narración generada con Piper, voz es_MX Claude.'
