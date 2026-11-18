@@ -26,6 +26,8 @@ jobs:
           curl -fLsS --retry 3 "$root/es_MX-claude-high.onnx.json" -o .voz/es_MX-claude-high.onnx.json
           python preparar.py
       - run: npm ci
+      - name: Instalar verificador de MP4
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Exportar los cuatro videos
         run: |
           mkdir -p exportaciones
@@ -33,6 +35,11 @@ jobs:
           for clip in 1 2 3; do
             npx remotion render index.jsx Apolo11Clip$clip exportaciones/clip-0$clip.mp4 --browser-executable=/usr/bin/google-chrome --concurrency=2
           done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: videos-apolo-11
+          path: exportaciones/*.mp4
+          if-no-files-found: error
       - name: Verificar formato y duración
         run: |
           python - <<'PY'
